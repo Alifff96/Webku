@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>alifff96.com | Platform UMKM Bengkel</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-grid">
+      <div class="hero">
+        <span class="eyebrow">alifff96.com</span>
+        <h1>Platform UMKM Bengkel, Mekanik & Sparepart</h1>
+        <p>alifff96.com menghubungkan bengkel, mekanik terdaftar, dan toko sparepart dalam satu platform digital.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#benefits">Daftar Sekarang</a>
+          <a class="btn-secondary" href="#marketplace">Lihat Layanan</a>
+          <a class="btn-secondary" href="mechanic.html">Halaman Mekanik</a>
+          <a class="btn-secondary" href="admin.html">Halaman Admin</a>
+        </div>
+      </div>
+
+      <aside class="hero-card">
+        <h2>Solusi Untuk Bengkel</h2>
+        <p>Bangun kehadiran digital bengkel Anda dengan aplikasi yang memudahkan pelanggan mencari servis dan sparepart lokal.</p>
+        <ul>
+          <li>Mekanik terverifikasi</li>
+          <li>Toko sparepart UMKM</li>
+          <li>Booking servis cepat</li>
+        </ul>
+      </aside>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="benefits" class="section cards">
+      <article class="card">
+        <h2>Kenapa Aplikasi Ini?</h2>
+        <ul class="feature-list">
+          <li>Menghubungkan pelanggan dengan bengkel dan mekanik lokal</li>
+          <li>Marketplace sparepart lengkap untuk motor dan mobil</li>
+          <li>Layanan pesan antar dan servis on-demand</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Cek Permintaan</h2>
+        <p>Contoh interaksi sederhana yang menunjukkan volume permintaan servis dalam aplikasi.</p>
+        <button id="counterBtn" class="btn-secondary">Lihat Estimasi</button>
+        <p class="result">Permintaan hari ini: <span id="count">0</span></p>
+      </article>
+    </section>
+
+    <section id="marketplace" class="section cards">
+      <article class="card">
+        <h2>Kontak Mekanik / Bengkel</h2>
+        <form id="demoForm">
+          <label for="name">Nama Anda</label>
+          <input id="name" name="name" type="text" placeholder="Masukkan nama" required />
+          <label for="service">Layanan yang Dibutuhkan</label>
+          <input id="service" name="service" type="text" placeholder="Contoh: servis motor, ganti oli" required />
+          <button type="submit" class="btn-secondary">Kirim Permintaan</button>
+        </form>
+        <p class="result" id="greeting"></p>
+      </article>
+      <article class="card">
+        <h2>Status Server</h2>
+        <p>Server aktif dan siap menerima permintaan melalui endpoint API.</p>
+        <button id="statusBtn" class="btn-secondary">Cek Status Server</button>
+        <p class="result" id="statusResult"></p>
+      </article>
+
+      <article class="card">
+        <h2>Marketplace Sparepart</h2>
+        <p>Platform ini ideal untuk mempromosikan toko onderdil lokal yang menyediakan berbagai sparepart berkualitas.</p>
+        <ul class="feature-list">
+          <li>Stok sparepart motor dan mobil</li>
+          <li>Harga UMKM yang kompetitif</li>
+          <li>Pengiriman cepat ke pelanggan</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="section info">
+      <h2>Apa yang Ditawarkan</h2>
+      <p>Aplikasi promosi ini membantu UMKM bengkel untuk tampil di pasar dengan layanan yang mudah dipesan dan mekanik terpercaya.</p>
+      <ul>
+        <li>Branding bengkel dan toko sparepart</li>
+        <li>Integrasi layanan booking dan pemesanan</li>
+        <li>Fokus pada UMKM lokal dan mekanik terdaftar</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> alifff96.com</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

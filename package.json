@@ -1,0 +1,12 @@
+{
+  "name": "webku-umkm-bengkel",
+  "version": "1.0.0",
+  "description": "Website promosi UMKM bengkel dengan server Node.js gratis dan aplikasi aktif.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.4"
+  }
+}

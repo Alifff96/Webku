@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daftar & Login Mekanik | alifff96.com</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-grid">
+      <div class="hero">
+        <span class="eyebrow">alifff96.com</span>
+        <h1>Daftar dan masuk sebagai mekanik Bengkel</h1>
+        <p>Kelola profil mekanik Anda, terima permintaan layanan, dan tampilkan ke pelanggan UMKM di alifff96.com.</p>
+        <div class="hero-actions">
+          <a class="btn" href="index.html">Kembali ke Beranda</a>
+          <a class="btn-secondary" href="admin.html">Halaman Admin</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="section cards">
+      <article class="card">
+        <h2>Daftar Mekanik</h2>
+        <p>Daftar sekarang untuk menjadi mekanik terdaftar di aplikasi bengkel UMKM.</p>
+        <form id="registerForm">
+          <label for="fullName">Nama Lengkap</label>
+          <input id="fullName" name="fullName" type="text" placeholder="Masukkan nama lengkap" required />
+
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="example@bengkel.com" required />
+
+          <label for="phone">Nomor Telepon</label>
+          <input id="phone" name="phone" type="tel" placeholder="0812xxxxxxx" required />
+
+          <label for="skills">Keahlian</label>
+          <input id="skills" name="skills" type="text" placeholder="Servis motor, ganti oli, dll." required />
+
+          <label for="password">Kata Sandi</label>
+          <input id="password" name="password" type="password" placeholder="Buat kata sandi" required />
+
+          <button type="submit" class="btn-secondary">Daftar Mekanik</button>
+        </form>
+        <p class="result" id="registerResult"></p>
+      </article>
+
+      <article class="card">
+        <h2>Login Mekanik</h2>
+        <p>Masuk untuk mengakses permintaan layanan dan jadwal.</p>
+        <form id="loginForm">
+          <label for="loginEmail">Email</label>
+          <input id="loginEmail" name="loginEmail" type="email" placeholder="example@bengkel.com" required />
+
+          <label for="loginPassword">Kata Sandi</label>
+          <input id="loginPassword" name="loginPassword" type="password" placeholder="Kata sandi Anda" required />
+
+          <button type="submit" class="btn-secondary">Login Mekanik</button>
+        </form>
+        <p class="result" id="loginResult"></p>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> alifff96.com</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

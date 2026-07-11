@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin | alifff96.com</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-grid">
+      <div class="hero">
+        <span class="eyebrow">alifff96.com</span>
+        <h1>Halaman Admin alifff96.com</h1>
+        <p>Kelola mekanik, permintaan layanan, dan data toko sparepart untuk platform UMKM Bengkel.</p>
+        <div class="hero-actions">
+          <a class="btn" href="index.html">Kembali ke Beranda</a>
+          <a class="btn-secondary" href="mechanic.html">Halaman Mekanik</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="section cards">
+      <article class="card">
+        <h2>Login Admin</h2>
+        <form id="adminLoginForm">
+          <label for="adminEmail">Email Admin</label>
+          <input id="adminEmail" name="adminEmail" type="email" placeholder="admin@bengkel.com" required />
+
+          <label for="adminPassword">Kata Sandi</label>
+          <input id="adminPassword" name="adminPassword" type="password" placeholder="Kata sandi admin" required />
+
+          <button type="submit" class="btn-secondary">Login Admin</button>
+        </form>
+        <p class="result" id="adminLoginResult"></p>
+      </article>
+
+      <article class="card">
+        <h2>Info Admin</h2>
+        <p>Admin dapat melihat status server dan mengelola permintaan mekanik.</p>
+        <ul class="feature-list">
+          <li>Login admin sederhana</li>
+          <li>Pengecekan status server</li>
+          <li>Mekanisme demonstrasi aplikasi</li>
+        </ul>
+      </article>
+
+      <article class="card hidden" id="adminPanel">
+        <h2>Dashboard Admin</h2>
+        <p>Daftar mekanik terdaftar dan permintaan layanan yang masuk.</p>
+        <div class="admin-actions">
+          <button id="loadMechanicsBtn" class="btn-secondary">Muat Mekanik Terdaftar</button>
+          <button id="loadRequestsBtn" class="btn-secondary">Muat Permintaan Layanan</button>
+          <select id="requestFilter" class="status-filter">
+            <option value="all">Semua Status</option>
+            <option value="baru">Baru</option>
+            <option value="diproses">Diproses</option>
+            <option value="selesai">Selesai</option>
+          </select>
+          <button id="adminLogoutBtn" class="btn">Logout Admin</button>
+        </div>
+        <div class="dashboard-block">
+          <h3>Mekanik Terdaftar</h3>
+          <div id="mechanicsList" class="mechanics-list"></div>
+        </div>
+        <div class="dashboard-block">
+          <h3>Permintaan Layanan</h3>
+          <div id="requestsList" class="mechanics-list"></div>
+        </div>
+        <div class="status-card">
+          <button id="serverStatusBtn" class="btn-secondary">Cek Status Server</button>
+          <p class="result" id="serverStatusResult"></p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> alifff96.com</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

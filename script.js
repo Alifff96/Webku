@@ -8,6 +8,9 @@ const statusResult = document.getElementById("statusResult");
 const serviceCatalogList = document.getElementById("serviceCatalogList");
 const partsCatalogList = document.getElementById("partsCatalogList");
 const copyResult = document.getElementById("copyResult");
+const invoiceContent = document.getElementById("invoiceContent");
+const customerRegisterForm = document.getElementById("customerRegisterForm");
+const customerRegisterResult = document.getElementById("customerRegisterResult");
 const registerForm = document.getElementById("registerForm");
 const loginForm = document.getElementById("loginForm");
 const adminLoginForm = document.getElementById("adminLoginForm");
@@ -17,6 +20,7 @@ const adminLoginResult = document.getElementById("adminLoginResult");
 const adminPanel = document.getElementById("adminPanel");
 const loadMechanicsBtn = document.getElementById("loadMechanicsBtn");
 const mechanicsList = document.getElementById("mechanicsList");
+const customersList = document.getElementById("customersList");
 const loadRequestsBtn = document.getElementById("loadRequestsBtn");
 const requestsList = document.getElementById("requestsList");
 const requestFilter = document.getElementById("requestFilter");
@@ -28,6 +32,12 @@ const adminLogoutBtn = document.getElementById("adminLogoutBtn");
 const serverStatusBtn = document.getElementById("serverStatusBtn");
 const serverStatusResult = document.getElementById("serverStatusResult");
 const mechanicPanel = document.getElementById("mechanicPanel");
+const mechanicServiceForm = document.getElementById("mechanicServiceForm");
+const mechanicPartForm = document.getElementById("mechanicPartForm");
+const mechanicServiceResult = document.getElementById("mechanicServiceResult");
+const mechanicPartResult = document.getElementById("mechanicPartResult");
+const mechanicServiceCatalogList = document.getElementById("mechanicServiceCatalogList");
+const mechanicPartCatalogList = document.getElementById("mechanicPartCatalogList");
 const mechanicLogoutBtn = document.getElementById("mechanicLogoutBtn");
 const loadMechanicRequestsBtn = document.getElementById("loadMechanicRequestsBtn");
 const mechanicRequestsList = document.getElementById("mechanicRequestsList");
@@ -40,18 +50,6 @@ const mechanicProfileResult = document.getElementById("mechanicProfileResult");
 const profilePhoneInput = document.getElementById("profilePhone");
 const profileSkillsInput = document.getElementById("profileSkills");
 const profilePasswordInput = document.getElementById("profilePassword");
-const adminServiceForm = document.getElementById("adminServiceForm");
-const adminServiceResult = document.getElementById("adminServiceResult");
-const adminPartForm = document.getElementById("adminPartForm");
-const adminPartResult = document.getElementById("adminPartResult");
-const adminServiceCatalogList = document.getElementById("adminServiceCatalogList");
-const adminPartCatalogList = document.getElementById("adminPartCatalogList");
-const mechanicServiceForm = document.getElementById("mechanicServiceForm");
-const mechanicServiceResult = document.getElementById("mechanicServiceResult");
-const mechanicPartForm = document.getElementById("mechanicPartForm");
-const mechanicPartResult = document.getElementById("mechanicPartResult");
-const mechanicServiceCatalogList = document.getElementById("mechanicServiceCatalogList");
-const mechanicPartCatalogList = document.getElementById("mechanicPartCatalogList");
 
 let count = 0;
 let adminLoggedIn = false;
@@ -77,11 +75,26 @@ if (demoForm && greeting) {
     event.preventDefault();
     const formData = new FormData(demoForm);
     const name = formData.get("name").toString().trim();
+    const email = formData.get("email").toString().trim();
+    const phone = formData.get("phone").toString().trim();
     const service = formData.get("service").toString().trim();
     const category = formData.get("category").toString().trim();
 
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phonePattern = /^08[0-9]{8,12}$/;
+
     if (name.length < 3) {
       greeting.textContent = "Nama harus minimal 3 karakter.";
+      return;
+    }
+
+    if (!emailPattern.test(email)) {
+      greeting.textContent = "Email tidak valid.";
+      return;
+    }
+
+    if (!phonePattern.test(phone)) {
+      greeting.textContent = "Nomor HP tidak valid. Gunakan format 08xxxxxxxx.";
       return;
     }
 
@@ -95,7 +108,7 @@ if (demoForm && greeting) {
       return;
     }
 
-        const paymentMethod = paymentMethodInput ? paymentMethodInput.value : "";
+    const paymentMethod = paymentMethodInput ? paymentMethodInput.value : "";
     if (!paymentMethod) {
       greeting.textContent = "Pilih metode pembayaran.";
       return;
@@ -105,7 +118,7 @@ if (demoForm && greeting) {
       const response = await fetch("/api/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, service, category, paymentMethod }),
+        body: JSON.stringify({ name, email, phone, service, category, paymentMethod }),
       });
 
       const data = await response.json();
@@ -115,10 +128,53 @@ if (demoForm && greeting) {
         return;
       }
 
-      greeting.innerHTML = `${data.message}<br /><strong>Pembayaran:</strong> ${data.paymentInstruction}`;
+      greeting.innerHTML = `${data.message}<br /><strong>Pembayaran:</strong> ${data.paymentInstruction}<br /><a href="${data.invoiceUrl}" class="btn-secondary">Lihat Invoice</a>`;
       demoForm.reset();
     } catch (error) {
       greeting.textContent = "Tidak dapat terhubung ke server. Coba lagi nanti.";
+    }
+  });
+}
+
+if (customerRegisterForm && customerRegisterResult) {
+  customerRegisterForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(customerRegisterForm);
+    const name = formData.get("customerName").toString().trim();
+    const email = formData.get("customerEmail").toString().trim();
+    const phone = formData.get("customerPhone").toString().trim();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phonePattern = /^08[0-9]{8,12}$/;
+
+    if (name.length < 3) {
+      customerRegisterResult.textContent = "Nama pelanggan minimal 3 karakter.";
+      return;
+    }
+
+    if (!emailPattern.test(email)) {
+      customerRegisterResult.textContent = "Email tidak valid.";
+      return;
+    }
+
+    if (!phonePattern.test(phone)) {
+      customerRegisterResult.textContent = "Nomor HP tidak valid. Gunakan format 08xxxxxxxx.";
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/customer/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, phone }),
+      });
+      const data = await response.json();
+      customerRegisterResult.textContent = data.message || "Pendaftaran pelanggan berhasil.";
+      if (response.ok) {
+        customerRegisterForm.reset();
+      }
+    } catch (error) {
+      customerRegisterResult.textContent = "Tidak dapat mendaftar sekarang. Coba lagi nanti.";
     }
   });
 }
@@ -237,7 +293,6 @@ if (adminLoginForm && adminLoginResult) {
         adminLoggedIn = true;
         loadMechanics();
         loadRequests();
-        loadAdminCatalogs();
       }
     } catch (error) {
       adminLoginResult.textContent = "Tidak dapat login admin. Coba lagi nanti.";
@@ -380,61 +435,54 @@ const loadPartsCatalog = async () => {
   }
 };
 
+const getQueryParam = (name) => {
+  const searchParams = new URLSearchParams(window.location.search);
+  return searchParams.get(name);
+};
+
+const loadInvoicePage = async () => {
+  if (!invoiceContent) return;
+
+  const requestId = getQueryParam("id");
+  if (!requestId) {
+    invoiceContent.innerHTML = "<p>ID invoice tidak diberikan.</p>";
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/request/${requestId}`);
+    const data = await response.json();
+
+    if (!response.ok) {
+      invoiceContent.innerHTML = `<p>${data.message || "Invoice tidak ditemukan."}</p>`;
+      return;
+    }
+
+    const request = data.request;
+    invoiceContent.innerHTML = `
+      <div class="invoice-card">
+        <p><strong>ID Invoice:</strong> ${request.id}</p>
+        <p><strong>Nama Pelanggan:</strong> ${request.name}</p>
+        <p><strong>Email:</strong> ${request.email}</p>
+        <p><strong>HP:</strong> ${request.phone}</p>
+        <p><strong>Layanan:</strong> ${request.service}</p>
+        <p><strong>Kategori:</strong> ${request.category}</p>
+        <p><strong>Metode Pembayaran:</strong> ${request.paymentMethod}</p>
+        <p><strong>Instruksi Pembayaran:</strong> ${data.paymentInstruction || "-"}</p>
+        <p><strong>Status:</strong> ${request.status}</p>
+        <p><strong>Waktu:</strong> ${new Date(request.createdAt).toLocaleString()}</p>
+        <p><strong>Mekanik Ditugaskan:</strong> ${request.assignedMechanicEmail || "Belum ditugaskan"}</p>
+      </div>
+    `;
+  } catch (error) {
+    invoiceContent.innerHTML = "<p>Tidak dapat memuat invoice saat ini.</p>";
+  }
+};
+
 const initPublicPage = async () => {
   await loadServiceCatalog();
   await loadPartsCatalog();
-};
-
-const loadAdminCatalogs = async () => {
-  if (adminServiceCatalogList) {
-    try {
-      const response = await fetch("/api/services", { credentials: "include" });
-      const data = await response.json();
-      if (response.ok) {
-        renderCatalogList(data.services, adminServiceCatalogList);
-      }
-    } catch (error) {
-      adminServiceCatalogList.innerHTML = "<p>Tidak dapat memuat layanan admin.</p>";
-    }
-  }
-
-  if (adminPartCatalogList) {
-    try {
-      const response = await fetch("/api/parts", { credentials: "include" });
-      const data = await response.json();
-      if (response.ok) {
-        renderCatalogList(data.parts, adminPartCatalogList);
-      }
-    } catch (error) {
-      adminPartCatalogList.innerHTML = "<p>Tidak dapat memuat sparepart admin.</p>";
-    }
-  }
-};
-
-const loadMechanicCatalogs = async () => {
-  if (mechanicServiceCatalogList) {
-    try {
-      const response = await fetch("/api/services", { credentials: "include" });
-      const data = await response.json();
-      if (response.ok) {
-        renderCatalogList(data.services, mechanicServiceCatalogList);
-      }
-    } catch (error) {
-      mechanicServiceCatalogList.innerHTML = "<p>Tidak dapat memuat layanan mekanik.</p>";
-    }
-  }
-
-  if (mechanicPartCatalogList) {
-    try {
-      const response = await fetch("/api/parts", { credentials: "include" });
-      const data = await response.json();
-      if (response.ok) {
-        renderCatalogList(data.parts, mechanicPartCatalogList);
-      }
-    } catch (error) {
-      mechanicPartCatalogList.innerHTML = "<p>Tidak dapat memuat sparepart mekanik.</p>";
-    }
-  }
+  await loadInvoicePage();
 };
 
 const loadMechanicRequests = async () => {
@@ -467,8 +515,8 @@ const checkAdminSession = async () => {
       adminLoggedIn = true;
       adminPanel.classList.remove("hidden");
       loadMechanics();
+      loadCustomers();
       loadRequests();
-      loadAdminCatalogs();
     }
   } catch (error) {
     // ignore session restore failure
@@ -530,6 +578,48 @@ const updateMechanicProfile = async (event) => {
   }
 };
 
+const renderMechanicCatalogLists = (services, parts) => {
+  if (mechanicServiceCatalogList) {
+    mechanicServiceCatalogList.innerHTML = services.length
+      ? services
+          .map(
+            (service) =>
+              `<div class="catalog-item"><strong>${service.name}</strong><p>${service.description}</p><p><em>${service.category}</em></p><p class="catalog-meta">Ditambahkan oleh: ${service.createdBy}</p></div>`
+          )
+          .join("")
+      : "<p>Belum ada jasa tambahan.</p>";
+  }
+
+  if (mechanicPartCatalogList) {
+    mechanicPartCatalogList.innerHTML = parts.length
+      ? parts
+          .map(
+            (part) =>
+              `<div class="catalog-item"><strong>${part.name}</strong><p>${part.description}</p><p><strong>${part.price}</strong></p><p class="catalog-meta">Ditambahkan oleh: ${part.createdBy}</p></div>`
+          )
+          .join("")
+      : "<p>Belum ada sparepart tambahan.</p>";
+  }
+};
+
+const loadMechanicCatalog = async () => {
+  try {
+    const [servicesResponse, partsResponse] = await Promise.all([
+      fetch("/api/services"),
+      fetch("/api/parts"),
+    ]);
+
+    const servicesData = await servicesResponse.json();
+    const partsData = await partsResponse.json();
+
+    if (servicesResponse.ok && partsResponse.ok) {
+      renderMechanicCatalogLists(servicesData.services || [], partsData.parts || []);
+    }
+  } catch (error) {
+    // ignore if catalog fails to load
+  }
+};
+
 const checkMechanicSession = async () => {
   if (!mechanicPanel) return;
 
@@ -546,7 +636,8 @@ const checkMechanicSession = async () => {
         mechanicWelcome.textContent = `Halo ${data.mechanic.fullName}, ini permintaan layanan terbaru.`;
       }
       await loadMechanicProfile();
-      loadMechanicRequests();
+      await loadMechanicRequests();
+      await loadMechanicCatalog();
     }
   } catch (error) {
     // ignore session restore failure
@@ -600,7 +691,6 @@ if (loginForm && loginResult) {
         }
         await loadMechanicProfile();
         loadMechanicRequests();
-        loadMechanicCatalogs();
       }
     } catch (error) {
       loginResult.textContent = "Tidak dapat login. Coba lagi nanti.";
@@ -649,6 +739,100 @@ if (mechanicLogoutBtn) {
 if (mechanicProfileForm) {
   mechanicProfileForm.addEventListener("submit", updateMechanicProfile);
 }
+
+const submitMechanicService = async (event) => {
+  event.preventDefault();
+  if (!mechanicServiceForm || !mechanicServiceResult) return;
+
+  const formData = new FormData(mechanicServiceForm);
+  const name = formData.get("name").toString().trim();
+  const description = formData.get("description").toString().trim();
+  const category = formData.get("category").toString().trim();
+
+  if (!name || !description || !category) {
+    mechanicServiceResult.textContent = "Semua bidang jasa harus diisi.";
+    return;
+  }
+
+  mechanicServiceResult.textContent = "Menyimpan jasa...";
+
+  try {
+    const response = await fetch("/api/mechanic/service", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ name, description, category }),
+    });
+
+    const data = await response.json();
+    mechanicServiceResult.textContent = data.message || "Jasa berhasil ditambahkan.";
+    if (response.ok) {
+      mechanicServiceForm.reset();
+      await loadMechanicCatalog();
+    }
+  } catch (error) {
+    mechanicServiceResult.textContent = "Gagal menyimpan jasa sekarang.";
+  }
+};
+
+const submitMechanicPart = async (event) => {
+  event.preventDefault();
+  if (!mechanicPartForm || !mechanicPartResult) return;
+
+  const formData = new FormData(mechanicPartForm);
+  const name = formData.get("name").toString().trim();
+  const description = formData.get("description").toString().trim();
+  const price = formData.get("price").toString().trim();
+
+  if (!name || !description || !price) {
+    mechanicPartResult.textContent = "Semua bidang sparepart harus diisi.";
+    return;
+  }
+
+  mechanicPartResult.textContent = "Menyimpan sparepart...";
+
+  try {
+    const response = await fetch("/api/mechanic/part", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ name, description, price }),
+    });
+
+    const data = await response.json();
+    mechanicPartResult.textContent = data.message || "Sparepart berhasil ditambahkan.";
+    if (response.ok) {
+      mechanicPartForm.reset();
+      await loadMechanicCatalog();
+    }
+  } catch (error) {
+    mechanicPartResult.textContent = "Gagal menyimpan sparepart sekarang.";
+  }
+};
+
+if (mechanicServiceForm) {
+  mechanicServiceForm.addEventListener("submit", submitMechanicService);
+}
+
+if (mechanicPartForm) {
+  mechanicPartForm.addEventListener("submit", submitMechanicPart);
+}
+
+const renderCustomersList = (customers) => {
+  if (!customersList) return;
+
+  if (customers.length === 0) {
+    customersList.innerHTML = "<p>Tidak ada pelanggan terdaftar saat ini.</p>";
+    return;
+  }
+
+  customersList.innerHTML = customers
+    .map(
+      (customer) =>
+        `<div class="mechanic-item"><strong>${customer.name}</strong><p>${customer.email} · ${customer.phone}</p></div>`
+    )
+    .join("");
+};
 
 const renderMechanicsList = (mechanics, requests = []) => {
   if (!mechanicsList) return;
@@ -705,6 +889,24 @@ const loadMechanics = async () => {
     updateAdminSummary(cachedMechanics, cachedRequests);
   } catch (error) {
     mechanicsList.innerHTML = "<p>Tidak dapat memuat mekanik sekarang.</p>";
+  }
+};
+
+const loadCustomers = async () => {
+  if (!customersList) return;
+
+  try {
+    const response = await fetch("/api/customers", { credentials: "include" });
+    const data = await response.json();
+
+    if (!response.ok) {
+      customersList.innerHTML = "<p>Gagal memuat pelanggan.</p>";
+      return;
+    }
+
+    renderCustomersList(data.customers || []);
+  } catch (error) {
+    customersList.innerHTML = "<p>Tidak dapat memuat pelanggan sekarang.</p>";
   }
 };
 
@@ -779,40 +981,6 @@ const renderRequestsList = (requests) => {
       await assignRequestToMechanic(requestId, mechanicEmail);
     });
   });
-};
-
-const saveCatalogItem = async (endpoint, payload, resultElement) => {
-  if (resultElement) {
-    resultElement.textContent = "Menyimpan...";
-  }
-
-  try {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(payload),
-    });
-
-    const data = await response.json();
-    if (!response.ok) {
-      if (resultElement) {
-        resultElement.textContent = data.message || "Gagal menyimpan katalog.";
-      }
-      return false;
-    }
-
-    if (resultElement) {
-      resultElement.textContent = data.message || "Data katalog berhasil disimpan.";
-    }
-
-    return true;
-  } catch (error) {
-    if (resultElement) {
-      resultElement.textContent = "Tidak dapat terhubung ke server.";
-    }
-    return false;
-  }
 };
 
 const updateRequestStatus = async (requestId, status) => {
@@ -890,41 +1058,6 @@ const updateAdminSummary = (mechanics, requests) => {
   summaryText.innerHTML = `Total mekanik: <strong>${totalMechanics}</strong> · Total permintaan: <strong>${totalRequests}</strong><br>Baru: <strong>${statusCounts.baru}</strong>, Diproses: <strong>${statusCounts.diproses}</strong>, Selesai: <strong>${statusCounts.selesai}</strong><br>Kategori: ${categorySummary}<br>Top mekanik: <strong>${topMechanics || "Belum ada penugasan"}</strong>`;
 };
 
-const handleCatalogForm = async (form, endpoint, resultElement) => {
-  if (!form) return;
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const formData = new FormData(form);
-    const name = formData.get("name")?.toString().trim() || "";
-    const description = formData.get("description")?.toString().trim() || "";
-    const price = formData.get("price")?.toString().trim() || "";
-    const category = formData.get("category")?.toString().trim() || "";
-
-    if (!name || !description || !price || (form.querySelector("select[name=category]") && !category)) {
-      if (resultElement) {
-        resultElement.textContent = "Semua bidang harus diisi.";
-      }
-      return;
-    }
-
-    const payload = { name, description, price };
-    if (category) {
-      payload.category = category;
-    }
-
-    const saved = await saveCatalogItem(endpoint, payload, resultElement);
-    if (saved) {
-      if (form.id.startsWith("admin")) {
-        loadAdminCatalogs();
-      } else if (form.id.startsWith("mechanic")) {
-        loadMechanicCatalogs();
-      }
-      form.reset();
-    }
-  });
-};
-
 const loadRequests = async () => {
   if (!requestsList) return;
 
@@ -961,11 +1094,6 @@ if (loadMechanicsBtn) {
 if (loadRequestsBtn) {
   loadRequestsBtn.addEventListener("click", loadRequests);
 }
-
-handleCatalogForm(adminServiceForm, "/api/catalog/service", adminServiceResult);
-handleCatalogForm(adminPartForm, "/api/catalog/part", adminPartResult);
-handleCatalogForm(mechanicServiceForm, "/api/catalog/service", mechanicServiceResult);
-handleCatalogForm(mechanicPartForm, "/api/catalog/part", mechanicPartResult);
 
 const refreshAdminRequestList = () => {
   if (cachedRequests.length === 0) return;

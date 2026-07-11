@@ -57,10 +57,28 @@
 
     <section id="marketplace" class="section cards">
       <article class="card">
+        <h2>Daftar Pelanggan</h2>
+        <form id="customerRegisterForm">
+          <label for="customerName">Nama Pelanggan</label>
+          <input id="customerName" name="customerName" type="text" placeholder="Masukkan nama" required />
+          <label for="customerEmail">Email</label>
+          <input id="customerEmail" name="customerEmail" type="email" placeholder="example@domain.com" required />
+          <label for="customerPhone">Nomor HP</label>
+          <input id="customerPhone" name="customerPhone" type="tel" placeholder="08xxxxxxxx" required />
+          <button type="submit" class="btn-secondary">Daftar Pelanggan</button>
+        </form>
+        <p class="result" id="customerRegisterResult"></p>
+      </article>
+
+      <article class="card">
         <h2>Kontak Mekanik / Bengkel</h2>
         <form id="demoForm">
           <label for="name">Nama Anda</label>
           <input id="name" name="name" type="text" placeholder="Masukkan nama" required />
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="example@domain.com" required />
+          <label for="phone">Nomor HP</label>
+          <input id="phone" name="phone" type="tel" placeholder="08xxxxxxxx" required />
           <label for="service">Layanan yang Dibutuhkan</label>
           <input id="service" name="service" type="text" placeholder="Contoh: servis motor, ganti oli" required />
           <label for="category">Kategori Layanan</label>
@@ -92,71 +110,16 @@
 
       <article class="card">
         <h2>Daftar Jasa & Sparepart</h2>
-        <div class="service-list" id="serviceCatalogList">
+        <div class="service-list">
           <h3>Daftar Jasa</h3>
-          <p>Memuat katalog layanan...</p>
+          <div class="catalog-grid" id="serviceCatalogList">
+            <p>Memuat katalog layanan...</p>
+          </div>
         </div>
-        <div class="service-list" id="partsCatalogList">
+        <div class="service-list">
           <h3>Daftar Sparepart</h3>
-          <p>Memuat katalog sparepart...</p>
-        </div>
-        <div class="brand-logos">
-          <h3>Brand Sparepart</h3>
-          <div class="brand-grid">
-            <div class="brand-card">
-              <div class="brand-icon" aria-label="Logo Honda">
-                <img src="images/honda.svg" alt="Logo Honda" />
-              </div>
-              <strong>Honda</strong>
-            </div>
-            <div class="brand-card">
-              <div class="brand-icon" aria-label="Logo Yamaha">
-                <img src="images/yamaha.svg" alt="Logo Yamaha" />
-              </div>
-              <strong>Yamaha</strong>
-            </div>
-            <div class="brand-card">
-              <div class="brand-icon" aria-label="Logo Suzuki">
-                <img src="images/suzuki.svg" alt="Logo Suzuki" />
-              </div>
-              <strong>Suzuki</strong>
-            </div>
-            <div class="brand-card">
-              <div class="brand-icon" aria-label="Logo Daihatsu">
-                <img src="images/daihatsu.svg" alt="Logo Daihatsu" />
-              </div>
-              <strong>Daihatsu</strong>
-            </div>
-            <div class="brand-card">
-              <div class="brand-icon" aria-label="Logo Toyota">
-                <img src="images/toyota.svg" alt="Logo Toyota" />
-              </div>
-              <strong>Toyota</strong>
-            </div>
-            <div class="brand-card">
-              <div class="brand-icon" aria-label="Logo Mitsubishi">
-                <img src="images/mitsubishi.svg" alt="Logo Mitsubishi" />
-              </div>
-              <strong>Mitsubishi</strong>
-            </div>
-            <div class="brand-card">
-              <div class="brand-icon" aria-label="Logo Nissan">
-                <img src="images/nissan.svg" alt="Logo Nissan" />
-              </div>
-              <strong>Nissan</strong>
-            </div>
-            <div class="brand-card">
-              <div class="brand-icon" aria-label="Logo Ford">
-                <img src="images/ford.svg" alt="Logo Ford" />
-              </div>
-              <strong>Ford</strong>
-            </div>
-            <div class="brand-card">
-              <div class="brand-icon" aria-label="Logo BMW">
-                <img src="images/bmw.svg" alt="Logo BMW" />
-              </div>
-              <strong>BMW</strong>
-            </div>
+          <div class="catalog-grid" id="partsCatalogList">
+            <p>Memuat katalog sparepart...</p>
           </div>
         </div>
         <div class="payment-info">

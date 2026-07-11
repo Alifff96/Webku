@@ -19,6 +19,9 @@ Website promosi untuk platform UMKM bengkel, mekanik terdaftar, dan toko sparepa
 
 - `GET /api/status` — memeriksa status server.
 - `POST /api/request` — kirim nama, kategori layanan, layanan, dan metode pembayaran untuk permintaan mekanik.
+- `GET /api/request/:id` — ambil detail permintaan berdasarkan ID untuk halaman invoice.
+- `POST /api/mechanic/service` — mekanik terautentikasi dapat menambahkan layanan baru.
+- `POST /api/mechanic/part` — mekanik terautentikasi dapat menambahkan sparepart baru.
 - `POST /api/request/assign` — tugaskan permintaan layanan ke mekanik (admin saja).
 - `GET /api/mechanic/requests` — ambil permintaan yang ditugaskan ke mekanik saat ini.
 - `GET /api/mechanic/profile` — ambil data profil mekanik yang login.

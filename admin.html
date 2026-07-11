@@ -80,47 +80,8 @@
           <p id="summaryText">Memuat data permintaan...</p>
         </div>
         <div class="dashboard-block">
-          <h3>Kelola Harga Jasa</h3>
-          <form id="adminServiceForm" class="catalog-form">
-            <label for="adminServiceName">Nama Jasa</label>
-            <input id="adminServiceName" name="name" type="text" placeholder="Contoh: Ganti Oli" required />
-            <label for="adminServiceDescription">Deskripsi</label>
-            <input id="adminServiceDescription" name="description" type="text" placeholder="Deskripsi singkat layanan" required />
-            <label for="adminServiceCategory">Kategori</label>
-            <select id="adminServiceCategory" name="category" required>
-              <option value="" disabled selected>Pilih kategori</option>
-              <option value="Servis Motor">Servis Motor</option>
-              <option value="Servis Mobil">Servis Mobil</option>
-              <option value="Ganti Oli">Ganti Oli</option>
-              <option value="Perbaikan Rem">Perbaikan Rem</option>
-              <option value="Elektrik Kendaraan">Elektrik Kendaraan</option>
-            </select>
-            <label for="adminServicePrice">Harga</label>
-            <input id="adminServicePrice" name="price" type="text" placeholder="Contoh: Rp 150.000" required />
-            <button type="submit" class="btn-secondary">Simpan Jasa</button>
-          </form>
-          <p class="result" id="adminServiceResult"></p>
-        </div>
-        <div class="dashboard-block">
-          <h3>Kelola Harga Sparepart</h3>
-          <form id="adminPartForm" class="catalog-form">
-            <label for="adminPartName">Nama Sparepart</label>
-            <input id="adminPartName" name="name" type="text" placeholder="Contoh: Oli Mesin" required />
-            <label for="adminPartDescription">Deskripsi</label>
-            <input id="adminPartDescription" name="description" type="text" placeholder="Deskripsi singkat sparepart" required />
-            <label for="adminPartPrice">Harga</label>
-            <input id="adminPartPrice" name="price" type="text" placeholder="Contoh: Rp 120.000" required />
-            <button type="submit" class="btn-secondary">Simpan Sparepart</button>
-          </form>
-          <p class="result" id="adminPartResult"></p>
-        </div>
-        <div class="dashboard-block">
-          <h3>Daftar Jasa Tersimpan</h3>
-          <div id="adminServiceCatalogList" class="catalog-grid"></div>
-        </div>
-        <div class="dashboard-block">
-          <h3>Daftar Sparepart Tersimpan</h3>
-          <div id="adminPartCatalogList" class="catalog-grid"></div>
+          <h3>Pelanggan Terdaftar</h3>
+          <div id="customersList" class="mechanics-list"></div>
         </div>
         <div class="dashboard-block">
           <h3>Mekanik Terdaftar</h3>

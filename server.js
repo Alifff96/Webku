@@ -10,7 +10,9 @@ const port = process.env.PORT || 8080;
 const dataDir = path.join(__dirname, "data");
 const mechanicsFile = path.join(dataDir, "mechanics.json");
 const requestsFile = path.join(dataDir, "requests.json");
-const catalogFile = path.join(dataDir, "catalog.json");
+const servicesFile = path.join(dataDir, "services.json");
+const partsFile = path.join(dataDir, "parts.json");
+const customersFile = path.join(dataDir, "customers.json");
 
 const ensureDataDirectory = () => {
   if (!fs.existsSync(dataDir)) {
@@ -42,35 +44,13 @@ const saveJsonFile = (filePath, data) => {
 
 ensureDataDirectory();
 
-const defaultServiceCatalog = [
-  { name: "Servis Motor", description: "Pemeriksaan dan perawatan lengkap untuk motor.", category: "Servis Motor", price: "Mulai Rp 120.000" },
-  { name: "Servis Mobil", description: "Servis berkala dan perbaikan mobil ringan.", category: "Servis Mobil", price: "Mulai Rp 200.000" },
-  { name: "Ganti Oli", description: "Penggantian oli mesin dan filter secara cepat.", category: "Ganti Oli", price: "Rp 80.000" },
-  { name: "Perbaikan Rem", description: "Pemeriksaan sistem rem serta penggantian kampas.", category: "Perbaikan Rem", price: "Mulai Rp 150.000" },
-  { name: "Elektrik Kendaraan", description: "Perbaikan kelistrikan dan audio kendaraan.", category: "Elektrik Kendaraan", price: "Harga sesuai permintaan" },
-  { name: "Instalasi Aksesoris", description: "Pasang aksesoris kendaraan seperti audio dan lampu.", category: "Servis Motor", price: "Mulai Rp 100.000" },
-];
-
-const defaultPartCatalog = [
-  { name: "Oli Mesin", description: "Oli berkualitas untuk motor dan mobil.", price: "Rp 120.000" },
-  { name: "Kampas Rem", description: "Kampas rem depan dan belakang berbagai jenis.", price: "Rp 150.000" },
-  { name: "Aki", description: "Aki standar untuk motor dan mobil.", price: "Rp 450.000" },
-  { name: "Filter Udara", description: "Filter udara OEM dan aftermarket.", price: "Rp 75.000" },
-  { name: "Ban dan Velg", description: "Pilihan ban dan velg untuk berbagai kebutuhan.", price: "Mulai Rp 300.000" },
-  { name: "Sistem Kelistrikan", description: "Sparepart kelistrikan lengkap untuk kendaraan.", price: "Harga sesuai permintaan" },
-];
-
-const catalogData = loadJsonFile(catalogFile, {
-  services: defaultServiceCatalog,
-  parts: defaultPartCatalog,
-});
-
 const mechanics = loadJsonFile(mechanicsFile, []);
 const serviceRequests = loadJsonFile(requestsFile, []);
-const serviceCatalog = catalogData.services || defaultServiceCatalog;
-const partCatalog = catalogData.parts || defaultPartCatalog;
+const customers = loadJsonFile(customersFile, []);
 
-const saveCatalog = () => saveJsonFile(catalogFile, { services: serviceCatalog, parts: partCatalog });
+if (!fs.existsSync(customersFile)) {
+  saveJsonFile(customersFile, customers);
+}
 
 const adminUser = {
   email: "admin@bengkel.com",
@@ -108,20 +88,6 @@ const requireMechanic = (req, res, next) => {
   next();
 };
 
-const requireAdminOrMechanic = (req, res, next) => {
-  const cookies = parseCookies(req.headers.cookie);
-  const isAdmin = cookies.adminToken && adminSessions.has(cookies.adminToken);
-  const mechanicEmail = cookies.mechanicToken && mechanicSessions.get(cookies.mechanicToken);
-
-  if (!isAdmin && !mechanicEmail) {
-    return res.status(401).json({ status: "error", message: "Akses admin atau mekanik dibutuhkan." });
-  }
-
-  req.isAdmin = isAdmin;
-  req.mechanicEmail = mechanicEmail;
-  next();
-};
-
 const isAdminTokenValid = (req) => {
   const cookies = parseCookies(req.headers.cookie);
   return cookies.adminToken && adminSessions.has(cookies.adminToken);
@@ -141,6 +107,35 @@ const paymentInstructions = {
   "Bank Mandiri": "Transfer ke Mandiri 070-123-4567 a.n. alifff96.com. Simpan bukti transfer untuk proses selanjutnya.",
 };
 
+const defaultServiceCatalog = [
+  { id: "SERV-001", name: "Servis Motor", description: "Pemeriksaan dan perawatan lengkap untuk motor.", category: "Servis Motor", createdBy: "system" },
+  { id: "SERV-002", name: "Servis Mobil", description: "Servis berkala dan perbaikan mobil ringan.", category: "Servis Mobil", createdBy: "system" },
+  { id: "SERV-003", name: "Ganti Oli", description: "Penggantian oli mesin dan filter secara cepat.", category: "Ganti Oli", createdBy: "system" },
+  { id: "SERV-004", name: "Perbaikan Rem", description: "Pemeriksaan sistem rem serta penggantian kampas.", category: "Perbaikan Rem", createdBy: "system" },
+  { id: "SERV-005", name: "Elektrik Kendaraan", description: "Perbaikan kelistrikan dan audio kendaraan.", category: "Elektrik Kendaraan", createdBy: "system" },
+  { id: "SERV-006", name: "Instalasi Aksesoris", description: "Pasang aksesoris kendaraan seperti audio dan lampu.", category: "Servis Motor", createdBy: "system" },
+];
+
+const defaultPartCatalog = [
+  { id: "PART-001", name: "Oli Mesin", description: "Oli berkualitas untuk motor dan mobil.", price: "Rp 120.000", createdBy: "system" },
+  { id: "PART-002", name: "Kampas Rem", description: "Kampas rem depan dan belakang berbagai jenis.", price: "Rp 150.000", createdBy: "system" },
+  { id: "PART-003", name: "Aki", description: "Aki standar untuk motor dan mobil.", price: "Rp 450.000", createdBy: "system" },
+  { id: "PART-004", name: "Filter Udara", description: "Filter udara OEM dan aftermarket.", price: "Rp 75.000", createdBy: "system" },
+  { id: "PART-005", name: "Ban dan Velg", description: "Pilihan ban dan velg untuk berbagai kebutuhan.", price: "Mulai Rp 300.000", createdBy: "system" },
+  { id: "PART-006", name: "Sistem Kelistrikan", description: "Sparepart kelistrikan lengkap untuk kendaraan.", price: "Harga sesuai permintaan", createdBy: "system" },
+];
+
+const serviceCatalog = loadJsonFile(servicesFile, defaultServiceCatalog);
+const partCatalog = loadJsonFile(partsFile, defaultPartCatalog);
+
+if (!fs.existsSync(servicesFile)) {
+  saveJsonFile(servicesFile, serviceCatalog);
+}
+
+if (!fs.existsSync(partsFile)) {
+  saveJsonFile(partsFile, partCatalog);
+}
+
 app.get("/api/services", (req, res) => {
   return res.json({ status: "success", services: serviceCatalog });
 });
@@ -149,55 +144,102 @@ app.get("/api/parts", (req, res) => {
   return res.json({ status: "success", parts: partCatalog });
 });
 
-app.post("/api/catalog/service", requireAdminOrMechanic, (req, res) => {
-  const { name, description, category, price } = req.body;
+app.post("/api/customer/register", (req, res) => {
+  const { name, email, phone } = req.body;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phonePattern = /^08[0-9]{8,12}$/;
 
-  if (!name || !description || !category || !price) {
-    return res.status(400).json({ status: "error", message: "Nama, deskripsi, kategori, dan harga layanan diperlukan." });
+  if (!name || !email || !phone) {
+    return res.status(400).json({ status: "error", message: "Semua bidang pendaftaran pelanggan harus diisi." });
   }
 
-  const existing = serviceCatalog.find((item) => item.name.toLowerCase() === name.toLowerCase());
-  if (existing) {
-    existing.description = description;
-    existing.category = category;
-    existing.price = price;
+  if (!emailPattern.test(email)) {
+    return res.status(400).json({ status: "error", message: "Email tidak valid." });
+  }
+
+  if (!phonePattern.test(phone)) {
+    return res.status(400).json({ status: "error", message: "Nomor HP tidak valid. Gunakan format 08xxxxxxxx." });
+  }
+
+  const existingCustomer = customers.find((customer) => customer.email === email);
+  if (existingCustomer) {
+    existingCustomer.name = name;
+    existingCustomer.phone = phone;
+    existingCustomer.updatedAt = new Date().toISOString();
   } else {
-    serviceCatalog.push({ name, description, category, price });
+    customers.push({ name, email, phone, registeredAt: new Date().toISOString() });
   }
 
-  saveCatalog();
-
-  return res.json({ status: "success", message: `Daftar jasa '${name}' berhasil disimpan.`, service: { name, description, category, price } });
+  saveJsonFile(customersFile, customers);
+  return res.json({ status: "success", message: "Pendaftaran pelanggan berhasil.", customer: { name, email, phone } });
 });
 
-app.post("/api/catalog/part", requireAdminOrMechanic, (req, res) => {
+app.get("/api/customers", requireAdmin, (req, res) => {
+  return res.json({ status: "success", customers });
+});
+
+app.post("/api/mechanic/service", requireMechanic, (req, res) => {
+  const { name, description, category } = req.body;
+
+  if (!name || !description || !category) {
+    return res.status(400).json({ status: "error", message: "Nama jasa, deskripsi, dan kategori diperlukan." });
+  }
+
+  const newService = {
+    id: `SERV-${Math.floor(Math.random() * 900000 + 100000)}`,
+    name,
+    description,
+    category,
+    createdBy: req.mechanicEmail,
+    createdAt: new Date().toISOString(),
+  };
+
+  serviceCatalog.push(newService);
+  saveJsonFile(servicesFile, serviceCatalog);
+
+  return res.json({ status: "success", message: "Jasa berhasil ditambahkan.", service: newService });
+});
+
+app.post("/api/mechanic/part", requireMechanic, (req, res) => {
   const { name, description, price } = req.body;
 
   if (!name || !description || !price) {
-    return res.status(400).json({ status: "error", message: "Nama, deskripsi, dan harga sparepart diperlukan." });
+    return res.status(400).json({ status: "error", message: "Nama sparepart, deskripsi, dan harga diperlukan." });
   }
 
-  const existing = partCatalog.find((item) => item.name.toLowerCase() === name.toLowerCase());
-  if (existing) {
-    existing.description = description;
-    existing.price = price;
-  } else {
-    partCatalog.push({ name, description, price });
-  }
+  const newPart = {
+    id: `PART-${Math.floor(Math.random() * 900000 + 100000)}`,
+    name,
+    description,
+    price,
+    createdBy: req.mechanicEmail,
+    createdAt: new Date().toISOString(),
+  };
 
-  saveCatalog();
+  partCatalog.push(newPart);
+  saveJsonFile(partsFile, partCatalog);
 
-  return res.json({ status: "success", message: `Daftar sparepart '${name}' berhasil disimpan.`, part: { name, description, price } });
+  return res.json({ status: "success", message: "Sparepart berhasil ditambahkan.", part: newPart });
 });
 
 app.post("/api/request", (req, res) => {
-  const { name, service, category, paymentMethod } = req.body;
+  const { name, email, phone, service, category, paymentMethod } = req.body;
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phonePattern = /^08[0-9]{8,12}$/;
 
-  if (!name || !service || !category || !paymentMethod) {
+  if (!name || !email || !phone || !service || !category || !paymentMethod) {
     return res.status(400).json({
       status: "error",
-      message: "Nama, layanan, kategori, dan metode pembayaran diperlukan.",
+      message: "Nama, email, no HP, layanan, kategori, dan metode pembayaran diperlukan.",
     });
+  }
+
+  if (!emailPattern.test(email)) {
+    return res.status(400).json({ status: "error", message: "Email tidak valid." });
+  }
+
+  if (!phonePattern.test(phone)) {
+    return res.status(400).json({ status: "error", message: "Nomor HP tidak valid. Gunakan format 08xxxxxxxx." });
   }
 
   if (!paymentInstructions[paymentMethod]) {
@@ -207,10 +249,22 @@ app.post("/api/request", (req, res) => {
     });
   }
 
+  const existingCustomer = customers.find((customer) => customer.email === email);
+  if (existingCustomer) {
+    existingCustomer.name = name;
+    existingCustomer.phone = phone;
+    existingCustomer.updatedAt = new Date().toISOString();
+  } else {
+    customers.push({ name, email, phone, registeredAt: new Date().toISOString() });
+  }
+  saveJsonFile(customersFile, customers);
+
   const requestId = `REQ-${Math.floor(Math.random() * 900000 + 100000)}`;
   const requestItem = {
     id: requestId,
     name,
+    email,
+    phone,
     service,
     category,
     paymentMethod,
@@ -227,6 +281,20 @@ app.post("/api/request", (req, res) => {
     message: `Halo ${name}, permintaan '${category} - ${service}' telah diterima. Mekanik terdaftar akan segera menghubungi Anda.`,
     paymentInstruction: paymentInstructions[paymentMethod],
     requestId,
+    invoiceUrl: `/invoice.html?id=${requestId}`,
+  });
+});
+
+app.get("/api/request/:id", (req, res) => {
+  const requestItem = serviceRequests.find((item) => item.id === req.params.id);
+  if (!requestItem) {
+    return res.status(404).json({ status: "error", message: "Permintaan layanan tidak ditemukan." });
+  }
+
+  return res.json({
+    status: "success",
+    request: requestItem,
+    paymentInstruction: paymentInstructions[requestItem.paymentMethod] || null,
   });
 });
 

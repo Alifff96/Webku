@@ -40,6 +40,14 @@ const mechanicProfileResult = document.getElementById("mechanicProfileResult");
 const profilePhoneInput = document.getElementById("profilePhone");
 const profileSkillsInput = document.getElementById("profileSkills");
 const profilePasswordInput = document.getElementById("profilePassword");
+const adminServiceForm = document.getElementById("adminServiceForm");
+const adminServiceResult = document.getElementById("adminServiceResult");
+const adminPartForm = document.getElementById("adminPartForm");
+const adminPartResult = document.getElementById("adminPartResult");
+const mechanicServiceForm = document.getElementById("mechanicServiceForm");
+const mechanicServiceResult = document.getElementById("mechanicServiceResult");
+const mechanicPartForm = document.getElementById("mechanicPartForm");
+const mechanicPartResult = document.getElementById("mechanicPartResult");
 
 let count = 0;
 let adminLoggedIn = false;
@@ -714,6 +722,40 @@ const renderRequestsList = (requests) => {
   });
 };
 
+const saveCatalogItem = async (endpoint, payload, resultElement) => {
+  if (resultElement) {
+    resultElement.textContent = "Menyimpan...";
+  }
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      if (resultElement) {
+        resultElement.textContent = data.message || "Gagal menyimpan katalog.";
+      }
+      return false;
+    }
+
+    if (resultElement) {
+      resultElement.textContent = data.message || "Data katalog berhasil disimpan.";
+    }
+
+    return true;
+  } catch (error) {
+    if (resultElement) {
+      resultElement.textContent = "Tidak dapat terhubung ke server.";
+    }
+    return false;
+  }
+};
+
 const updateRequestStatus = async (requestId, status) => {
   const resultElement = document.getElementById(`requestResult-${requestId}`);
   if (resultElement) {
@@ -789,6 +831,34 @@ const updateAdminSummary = (mechanics, requests) => {
   summaryText.innerHTML = `Total mekanik: <strong>${totalMechanics}</strong> · Total permintaan: <strong>${totalRequests}</strong><br>Baru: <strong>${statusCounts.baru}</strong>, Diproses: <strong>${statusCounts.diproses}</strong>, Selesai: <strong>${statusCounts.selesai}</strong><br>Kategori: ${categorySummary}<br>Top mekanik: <strong>${topMechanics || "Belum ada penugasan"}</strong>`;
 };
 
+const handleCatalogForm = async (form, endpoint, resultElement) => {
+  if (!form) return;
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = new FormData(form);
+    const name = formData.get("name")?.toString().trim() || "";
+    const description = formData.get("description")?.toString().trim() || "";
+    const price = formData.get("price")?.toString().trim() || "";
+    const category = formData.get("category")?.toString().trim() || "";
+
+    if (!name || !description || !price || (form.querySelector("select[name=category]") && !category)) {
+      if (resultElement) {
+        resultElement.textContent = "Semua bidang harus diisi.";
+      }
+      return;
+    }
+
+    const payload = { name, description, price };
+    if (category) {
+      payload.category = category;
+    }
+
+    await saveCatalogItem(endpoint, payload, resultElement);
+    form.reset();
+  });
+};
+
 const loadRequests = async () => {
   if (!requestsList) return;
 
@@ -825,6 +895,11 @@ if (loadMechanicsBtn) {
 if (loadRequestsBtn) {
   loadRequestsBtn.addEventListener("click", loadRequests);
 }
+
+handleCatalogForm(adminServiceForm, "/api/catalog/service", adminServiceResult);
+handleCatalogForm(adminPartForm, "/api/catalog/part", adminPartResult);
+handleCatalogForm(mechanicServiceForm, "/api/catalog/service", mechanicServiceResult);
+handleCatalogForm(mechanicPartForm, "/api/catalog/part", mechanicPartResult);
 
 const refreshAdminRequestList = () => {
   if (cachedRequests.length === 0) return;

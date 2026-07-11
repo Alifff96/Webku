@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>alifff96.com | Platform UMKM Bengkel</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <header class="site-header">
     <div class="container header-grid">
@@ -23,7 +25,8 @@
 
       <aside class="hero-card">
         <h2>Solusi Untuk Bengkel</h2>
-        <p>Bangun kehadiran digital bengkel Anda dengan aplikasi yang memudahkan pelanggan mencari servis dan sparepart lokal.</p>
+        <p>Bangun kehadiran digital bengkel Anda dengan aplikasi yang memudahkan pelanggan mencari servis dan sparepart
+          lokal.</p>
         <ul>
           <li>Mekanik terverifikasi</li>
           <li>Toko sparepart UMKM</li>
@@ -60,6 +63,22 @@
           <input id="name" name="name" type="text" placeholder="Masukkan nama" required />
           <label for="service">Layanan yang Dibutuhkan</label>
           <input id="service" name="service" type="text" placeholder="Contoh: servis motor, ganti oli" required />
+          <label for="category">Kategori Layanan</label>
+          <select id="category" name="category" required>
+            <option value="" disabled selected>Pilih kategori layanan</option>
+            <option value="Servis Motor">Servis Motor</option>
+            <option value="Servis Mobil">Servis Mobil</option>
+            <option value="Ganti Oli">Ganti Oli</option>
+            <option value="Perbaikan Rem">Perbaikan Rem</option>
+            <option value="Elektrik Kendaraan">Elektrik Kendaraan</option>
+          </select>
+          <label for="paymentMethod">Metode Pembayaran</label>
+          <select id="paymentMethod" name="paymentMethod" required>
+            <option value="" disabled selected>Pilih metode pembayaran</option>
+            <option value="DANA QRIS">DANA QRIS</option>
+            <option value="Bank BCA">Bank BCA</option>
+            <option value="Bank Mandiri">Bank Mandiri</option>
+          </select>
           <button type="submit" class="btn-secondary">Kirim Permintaan</button>
         </form>
         <p class="result" id="greeting"></p>
@@ -72,19 +91,32 @@
       </article>
 
       <article class="card">
-        <h2>Marketplace Sparepart</h2>
-        <p>Platform ini ideal untuk mempromosikan toko onderdil lokal yang menyediakan berbagai sparepart berkualitas.</p>
-        <ul class="feature-list">
-          <li>Stok sparepart motor dan mobil</li>
-          <li>Harga UMKM yang kompetitif</li>
-          <li>Pengiriman cepat ke pelanggan</li>
-        </ul>
+        <h2>Daftar Jasa & Sparepart</h2>
+        <div class="service-list" id="serviceCatalogList">
+          <h3>Daftar Jasa</h3>
+          <p>Memuat katalog layanan...</p>
+        </div>
+        <div class="service-list" id="partsCatalogList">
+          <h3>Daftar Sparepart</h3>
+          <p>Memuat katalog sparepart...</p>
+        </div>
+        <div class="payment-info">
+          <h3>Pembayaran</h3>
+          <p>Bayar dengan mudah via DANA QRIS atau transfer bank.</p>
+          <ul>
+            <li>DANA QRIS: 0857-1234-5678 <button class="btn-copy" data-copy="DANA QRIS: 0857-1234-5678">Salin</button></li>
+            <li>Bank BCA: 123-456-7890 a.n. alifff96.com <button class="btn-copy" data-copy="Bank BCA: 123-456-7890 a.n. alifff96.com">Salin</button></li>
+            <li>Bank Mandiri: 070-123-4567 a.n. alifff96.com <button class="btn-copy" data-copy="Bank Mandiri: 070-123-4567 a.n. alifff96.com">Salin</button></li>
+          </ul>
+          <p class="result" id="copyResult"></p>
+        </div>
       </article>
     </section>
 
     <section class="section info">
       <h2>Apa yang Ditawarkan</h2>
-      <p>Aplikasi promosi ini membantu UMKM bengkel untuk tampil di pasar dengan layanan yang mudah dipesan dan mekanik terpercaya.</p>
+      <p>Aplikasi promosi ini membantu UMKM bengkel untuk tampil di pasar dengan layanan yang mudah dipesan dan mekanik
+        terpercaya.</p>
       <ul>
         <li>Branding bengkel dan toko sparepart</li>
         <li>Integrasi layanan booking dan pemesanan</li>
@@ -99,4 +131,5 @@
 
   <script src="script.js"></script>
 </body>
+
 </html>

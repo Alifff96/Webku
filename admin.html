@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin | alifff96.com</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <header class="site-header">
     <div class="container header-grid">
@@ -53,13 +55,29 @@
         <div class="admin-actions">
           <button id="loadMechanicsBtn" class="btn-secondary">Muat Mekanik Terdaftar</button>
           <button id="loadRequestsBtn" class="btn-secondary">Muat Permintaan Layanan</button>
+          <input id="requestSearchInput" class="search-input" type="search" placeholder="Cari nama, ID, atau mekanik" />
+          <select id="assignedMechanicFilter" class="status-filter">
+            <option value="all">Semua Mekanik</option>
+          </select>
           <select id="requestFilter" class="status-filter">
             <option value="all">Semua Status</option>
             <option value="baru">Baru</option>
             <option value="diproses">Diproses</option>
             <option value="selesai">Selesai</option>
           </select>
+          <select id="categoryFilter" class="status-filter">
+            <option value="all">Semua Kategori</option>
+            <option value="Servis Motor">Servis Motor</option>
+            <option value="Servis Mobil">Servis Mobil</option>
+            <option value="Ganti Oli">Ganti Oli</option>
+            <option value="Perbaikan Rem">Perbaikan Rem</option>
+            <option value="Elektrik Kendaraan">Elektrik Kendaraan</option>
+          </select>
           <button id="adminLogoutBtn" class="btn">Logout Admin</button>
+        </div>
+        <div class="dashboard-summary" id="adminSummary">
+          <h3>Ringkasan Admin</h3>
+          <p id="summaryText">Memuat data permintaan...</p>
         </div>
         <div class="dashboard-block">
           <h3>Mekanik Terdaftar</h3>
@@ -83,4 +101,5 @@
 
   <script src="script.js"></script>
 </body>
+
 </html>

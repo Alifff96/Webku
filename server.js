@@ -1,16 +1,88 @@
 const express = require("express");
+const fs = require("fs");
 const path = require("path");
 const app = express();
-
-const port = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-const mechanics = [];
+const port = process.env.PORT || 8080;
+const dataDir = path.join(__dirname, "data");
+const mechanicsFile = path.join(dataDir, "mechanics.json");
+const requestsFile = path.join(dataDir, "requests.json");
+
+const ensureDataDirectory = () => {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+};
+
+const loadJsonFile = (filePath, defaultValue) => {
+  try {
+    if (!fs.existsSync(filePath)) {
+      return defaultValue;
+    }
+
+    const raw = fs.readFileSync(filePath, "utf8");
+    return JSON.parse(raw);
+  } catch (error) {
+    console.error(`Tidak dapat membaca file data: ${filePath}`, error);
+    return defaultValue;
+  }
+};
+
+const saveJsonFile = (filePath, data) => {
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error(`Tidak dapat menyimpan file data: ${filePath}`, error);
+  }
+};
+
+ensureDataDirectory();
+
+const mechanics = loadJsonFile(mechanicsFile, []);
+const serviceRequests = loadJsonFile(requestsFile, []);
+
 const adminUser = {
   email: "admin@bengkel.com",
   password: "admin123",
+};
+
+const parseCookies = (cookieHeader) => {
+  const cookies = {};
+  if (!cookieHeader) return cookies;
+  cookieHeader.split(";").forEach((cookie) => {
+    const [name, ...value] = cookie.trim().split("=");
+    cookies[name] = decodeURIComponent(value.join("="));
+  });
+  return cookies;
+};
+
+const createToken = () => Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+const adminSessions = new Set();
+const mechanicSessions = new Map();
+
+const requireAdmin = (req, res, next) => {
+  const cookies = parseCookies(req.headers.cookie);
+  if (!cookies.adminToken || !adminSessions.has(cookies.adminToken)) {
+    return res.status(401).json({ status: "error", message: "Akses admin dibutuhkan." });
+  }
+  next();
+};
+
+const requireMechanic = (req, res, next) => {
+  const cookies = parseCookies(req.headers.cookie);
+  if (!cookies.mechanicToken || !mechanicSessions.has(cookies.mechanicToken)) {
+    return res.status(401).json({ status: "error", message: "Akses mekanik dibutuhkan." });
+  }
+  req.mechanicEmail = mechanicSessions.get(cookies.mechanicToken);
+  next();
+};
+
+const isAdminTokenValid = (req) => {
+  const cookies = parseCookies(req.headers.cookie);
+  return cookies.adminToken && adminSessions.has(cookies.adminToken);
 };
 
 app.get("/api/status", (req, res) => {
@@ -21,15 +93,52 @@ app.get("/api/status", (req, res) => {
   });
 });
 
-const serviceRequests = [];
+const paymentInstructions = {
+  "DANA QRIS": "Silakan bayar via DANA QRIS ke 0857-1234-5678. Tunjukkan bukti pembayaran saat mekanik datang.",
+  "Bank BCA": "Transfer ke BCA 123-456-7890 a.n. alifff96.com. Simpan bukti transfer untuk konfirmasi.",
+  "Bank Mandiri": "Transfer ke Mandiri 070-123-4567 a.n. alifff96.com. Simpan bukti transfer untuk proses selanjutnya.",
+};
+
+const serviceCatalog = [
+  { name: "Servis Motor", description: "Pemeriksaan dan perawatan lengkap untuk motor.", category: "Servis Motor" },
+  { name: "Servis Mobil", description: "Servis berkala dan perbaikan mobil ringan.", category: "Servis Mobil" },
+  { name: "Ganti Oli", description: "Penggantian oli mesin dan filter secara cepat.", category: "Ganti Oli" },
+  { name: "Perbaikan Rem", description: "Pemeriksaan sistem rem serta penggantian kampas.", category: "Perbaikan Rem" },
+  { name: "Elektrik Kendaraan", description: "Perbaikan kelistrikan dan audio kendaraan.", category: "Elektrik Kendaraan" },
+  { name: "Instalasi Aksesoris", description: "Pasang aksesoris kendaraan seperti audio dan lampu.", category: "Servis Motor" },
+];
+
+const partCatalog = [
+  { name: "Oli Mesin", description: "Oli berkualitas untuk motor dan mobil.", price: "Rp 120.000" },
+  { name: "Kampas Rem", description: "Kampas rem depan dan belakang berbagai jenis.", price: "Rp 150.000" },
+  { name: "Aki", description: "Aki standar untuk motor dan mobil.", price: "Rp 450.000" },
+  { name: "Filter Udara", description: "Filter udara OEM dan aftermarket.", price: "Rp 75.000" },
+  { name: "Ban dan Velg", description: "Pilihan ban dan velg untuk berbagai kebutuhan.", price: "Mulai Rp 300.000" },
+  { name: "Sistem Kelistrikan", description: "Sparepart kelistrikan lengkap untuk kendaraan.", price: "Harga sesuai permintaan" },
+];
+
+app.get("/api/services", (req, res) => {
+  return res.json({ status: "success", services: serviceCatalog });
+});
+
+app.get("/api/parts", (req, res) => {
+  return res.json({ status: "success", parts: partCatalog });
+});
 
 app.post("/api/request", (req, res) => {
-  const { name, service } = req.body;
+  const { name, service, category, paymentMethod } = req.body;
 
-  if (!name || !service) {
+  if (!name || !service || !category || !paymentMethod) {
     return res.status(400).json({
       status: "error",
-      message: "Nama dan layanan diperlukan.",
+      message: "Nama, layanan, kategori, dan metode pembayaran diperlukan.",
+    });
+  }
+
+  if (!paymentInstructions[paymentMethod]) {
+    return res.status(400).json({
+      status: "error",
+      message: "Metode pembayaran tidak valid.",
     });
   }
 
@@ -38,15 +147,20 @@ app.post("/api/request", (req, res) => {
     id: requestId,
     name,
     service,
+    category,
+    paymentMethod,
+    assignedMechanicEmail: null,
     createdAt: new Date().toISOString(),
     status: "baru",
   };
 
   serviceRequests.push(requestItem);
+  saveJsonFile(requestsFile, serviceRequests);
 
   return res.json({
     status: "success",
-    message: `Halo ${name}, permintaan layanan '${service}' telah diterima. Mekanik terdaftar akan segera menghubungi Anda.`,
+    message: `Halo ${name}, permintaan '${category} - ${service}' telah diterima. Mekanik terdaftar akan segera menghubungi Anda.`,
+    paymentInstruction: paymentInstructions[paymentMethod],
     requestId,
   });
 });
@@ -70,6 +184,7 @@ app.post("/api/mechanic/register", (req, res) => {
   }
 
   mechanics.push({ fullName, email, phone, skills, password });
+  saveJsonFile(mechanicsFile, mechanics);
 
   return res.json({
     status: "success",
@@ -95,6 +210,13 @@ app.post("/api/mechanic/login", (req, res) => {
     });
   }
 
+  const mechanicToken = createToken();
+  mechanicSessions.set(mechanicToken, email);
+  res.setHeader(
+    "Set-Cookie",
+    `mechanicToken=${mechanicToken}; HttpOnly; Path=/; SameSite=Strict`
+  );
+
   return res.json({
     status: "success",
     message: `Selamat datang, ${mechanic.fullName}. Anda berhasil login sebagai mekanik.`,
@@ -118,23 +240,161 @@ app.post("/api/admin/login", (req, res) => {
     });
   }
 
+  const adminToken = createToken();
+  adminSessions.add(adminToken);
+  res.setHeader(
+    "Set-Cookie",
+    `adminToken=${adminToken}; HttpOnly; Path=/; SameSite=Strict`
+  );
+
   return res.json({
     status: "success",
     message: "Login admin berhasil. Selamat datang di dashboard admin.",
   });
 });
 
-app.get("/api/mechanics", (req, res) => {
+app.get("/api/mechanics", requireAdmin, (req, res) => {
   return res.json({
     status: "success",
     mechanics: mechanics.map(({ password, ...rest }) => rest),
   });
 });
 
-app.get("/api/requests", (req, res) => {
+app.get("/api/requests", requireAdmin, (req, res) => {
   return res.json({
     status: "success",
     requests: serviceRequests,
+  });
+});
+
+app.get("/api/admin/status", (req, res) => {
+  const loggedIn = isAdminTokenValid(req);
+  return res.json({
+    status: "success",
+    loggedIn,
+  });
+});
+
+app.get("/api/mechanic/status", (req, res) => {
+  const cookies = parseCookies(req.headers.cookie);
+  const mechanicEmail = cookies.mechanicToken && mechanicSessions.get(cookies.mechanicToken);
+  if (!mechanicEmail) {
+    return res.json({ status: "success", loggedIn: false });
+  }
+
+  const mechanic = mechanics.find((m) => m.email === mechanicEmail);
+  if (!mechanic) {
+    mechanicSessions.delete(cookies.mechanicToken);
+    return res.json({ status: "success", loggedIn: false });
+  }
+
+  return res.json({
+    status: "success",
+    loggedIn: true,
+    mechanic: {
+      fullName: mechanic.fullName,
+      email: mechanic.email,
+    },
+  });
+});
+
+app.get("/api/mechanic/profile", requireMechanic, (req, res) => {
+  const mechanic = mechanics.find((m) => m.email === req.mechanicEmail);
+  if (!mechanic) {
+    return res.status(404).json({ status: "error", message: "Profil mekanik tidak ditemukan." });
+  }
+
+  return res.json({
+    status: "success",
+    profile: {
+      fullName: mechanic.fullName,
+      email: mechanic.email,
+      phone: mechanic.phone,
+      skills: mechanic.skills,
+    },
+  });
+});
+
+app.post("/api/mechanic/profile", requireMechanic, (req, res) => {
+  const { phone, skills, password } = req.body;
+  const mechanic = mechanics.find((m) => m.email === req.mechanicEmail);
+
+  if (!mechanic) {
+    return res.status(404).json({ status: "error", message: "Profil mekanik tidak ditemukan." });
+  }
+
+  if (!phone || !skills) {
+    return res.status(400).json({ status: "error", message: "Nomor telepon dan keahlian diperlukan." });
+  }
+
+  if (password && password.length < 6) {
+    return res.status(400).json({ status: "error", message: "Kata sandi baru minimal 6 karakter." });
+  }
+
+  mechanic.phone = phone;
+  mechanic.skills = skills;
+  if (password) {
+    mechanic.password = password;
+  }
+
+  saveJsonFile(mechanicsFile, mechanics);
+
+  return res.json({
+    status: "success",
+    message: "Profil mekanik berhasil diperbarui.",
+    profile: {
+      fullName: mechanic.fullName,
+      email: mechanic.email,
+      phone: mechanic.phone,
+      skills: mechanic.skills,
+    },
+  });
+});
+
+app.post("/api/request/assign", requireAdmin, (req, res) => {
+  const { requestId, mechanicEmail } = req.body;
+
+  if (!requestId || !mechanicEmail) {
+    return res.status(400).json({
+      status: "error",
+      message: "ID permintaan dan email mekanik diperlukan.",
+    });
+  }
+
+  const requestItem = serviceRequests.find((item) => item.id === requestId);
+  if (!requestItem) {
+    return res.status(404).json({
+      status: "error",
+      message: "Permintaan layanan tidak ditemukan.",
+    });
+  }
+
+  const mechanic = mechanics.find((m) => m.email === mechanicEmail);
+  if (!mechanic) {
+    return res.status(404).json({
+      status: "error",
+      message: "Mekanik tidak ditemukan.",
+    });
+  }
+
+  requestItem.assignedMechanicEmail = mechanicEmail;
+  saveJsonFile(requestsFile, serviceRequests);
+
+  return res.json({
+    status: "success",
+    message: `Permintaan ${requestId} berhasil ditugaskan ke ${mechanic.fullName}.`,
+    request: requestItem,
+  });
+});
+
+app.get("/api/mechanic/requests", requireMechanic, (req, res) => {
+  const mechanicRequests = serviceRequests.filter(
+    (item) => item.assignedMechanicEmail === req.mechanicEmail
+  );
+
+  return res.json({
+    status: "success",
+    requests: mechanicRequests,
   });
 });
 
@@ -164,7 +424,20 @@ app.post("/api/request/status", (req, res) => {
     });
   }
 
+  const cookies = parseCookies(req.headers.cookie);
+  const isAdmin = cookies.adminToken && adminSessions.has(cookies.adminToken);
+  const mechanicEmail = cookies.mechanicToken && mechanicSessions.get(cookies.mechanicToken);
+  const isAssignedMechanic = mechanicEmail && requestItem.assignedMechanicEmail === mechanicEmail;
+
+  if (!isAdmin && !isAssignedMechanic) {
+    return res.status(403).json({
+      status: "error",
+      message: "Hanya admin atau mekanik yang ditugaskan dapat memperbarui status permintaan.",
+    });
+  }
+
   requestItem.status = status;
+  saveJsonFile(requestsFile, serviceRequests);
 
   return res.json({
     status: "success",
@@ -174,9 +447,36 @@ app.post("/api/request/status", (req, res) => {
 });
 
 app.post("/api/admin/logout", (req, res) => {
+  const cookies = parseCookies(req.headers.cookie);
+  if (cookies.adminToken) {
+    adminSessions.delete(cookies.adminToken);
+  }
+
+  res.setHeader(
+    "Set-Cookie",
+    "adminToken=; HttpOnly; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict"
+  );
+
   return res.json({
     status: "success",
     message: "Logout admin berhasil.",
+  });
+});
+
+app.post("/api/mechanic/logout", (req, res) => {
+  const cookies = parseCookies(req.headers.cookie);
+  if (cookies.mechanicToken) {
+    mechanicSessions.delete(cookies.mechanicToken);
+  }
+
+  res.setHeader(
+    "Set-Cookie",
+    "mechanicToken=; HttpOnly; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Strict"
+  );
+
+  return res.json({
+    status: "success",
+    message: "Logout mekanik berhasil.",
   });
 });
 

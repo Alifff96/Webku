@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Daftar & Login Mekanik | alifff96.com</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
   <header class="site-header">
     <div class="container header-grid">
@@ -61,6 +63,33 @@
         </form>
         <p class="result" id="loginResult"></p>
       </article>
+
+      <article class="card hidden" id="mechanicPanel">
+        <h2>Dashboard Mekanik</h2>
+        <p id="mechanicWelcome">Selamat datang, mekanik terdaftar.</p>
+        <div class="admin-actions">
+          <button id="loadMechanicRequestsBtn" class="btn-secondary">Muat Permintaan</button>
+          <select id="mechanicStatusFilter" class="status-filter">
+            <option value="all">Semua Status</option>
+            <option value="baru">Baru</option>
+            <option value="diproses">Diproses</option>
+            <option value="selesai">Selesai</option>
+          </select>
+          <select id="mechanicCategoryFilter" class="status-filter">
+            <option value="all">Semua Kategori</option>
+            <option value="Servis Motor">Servis Motor</option>
+            <option value="Servis Mobil">Servis Mobil</option>
+            <option value="Ganti Oli">Ganti Oli</option>
+            <option value="Perbaikan Rem">Perbaikan Rem</option>
+            <option value="Elektrik Kendaraan">Elektrik Kendaraan</option>
+          </select>
+          <button id="mechanicLogoutBtn" class="btn">Logout Mekanik</button>
+        </div>
+        <div class="dashboard-block">
+          <h3>Permintaan Mekanik</h3>
+          <div id="mechanicRequestsList" class="mechanics-list"></div>
+        </div>
+      </article>
     </section>
   </main>
 
@@ -70,4 +99,5 @@
 
   <script src="script.js"></script>
 </body>
+
 </html>

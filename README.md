@@ -18,7 +18,23 @@ Website promosi untuk platform UMKM bengkel, mekanik terdaftar, dan toko sparepa
 ## API Gratis dan Aktif
 
 - `GET /api/status` — memeriksa status server.
-- `POST /api/request` — kirim nama dan layanan untuk permintaan mekanik.
+- `POST /api/request` — kirim nama, kategori layanan, layanan, dan metode pembayaran untuk permintaan mekanik.
+- `POST /api/request/assign` — tugaskan permintaan layanan ke mekanik (admin saja).
+- `GET /api/mechanic/requests` — ambil permintaan yang ditugaskan ke mekanik saat ini.
+- `GET /api/mechanic/profile` — ambil data profil mekanik yang login.
+- `POST /api/mechanic/profile` — perbarui nomor telepon, keahlian, dan kata sandi mekanik.
+- `GET /api/admin/status` — periksa apakah sesi admin masih aktif.
+- `GET /api/mechanic/status` — periksa apakah sesi mekanik masih aktif.
+
+## Fitur
+- Penyimpanan data mekanik dan permintaan layanan menggunakan file JSON lokal.
+- Admin dapat melihat ringkasan permintaan berdasarkan status dan kategori.
+- Filter permintaan admin berdasarkan status dan kategori.
+- Dashboard mekanik dengan filter permintaan dan pembaruan status.
+
+## Data Persistence
+- Data mekanik disimpan di `data/mechanics.json`
+- Data permintaan layanan disimpan di `data/requests.json`
 
 ## Fitur
 

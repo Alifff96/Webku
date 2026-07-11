@@ -90,6 +90,20 @@
           <div id="mechanicRequestsList" class="mechanics-list"></div>
         </div>
         <div class="dashboard-block">
+          <h3>Profil Mekanik</h3>
+          <div id="mechanicProfileInfo"></div>
+          <form id="mechanicProfileForm" class="catalog-form">
+            <label for="profilePhone">Nomor Telepon</label>
+            <input id="profilePhone" name="phone" type="tel" placeholder="0812xxxxxxx" required />
+            <label for="profileSkills">Keahlian</label>
+            <input id="profileSkills" name="skills" type="text" placeholder="Servis motor, ganti oli, dll." required />
+            <label for="profilePassword">Ubah Kata Sandi</label>
+            <input id="profilePassword" name="password" type="password" placeholder="Kata sandi baru (opsional)" />
+            <button type="submit" class="btn-secondary">Simpan Profil</button>
+          </form>
+          <p class="result" id="mechanicProfileResult"></p>
+        </div>
+        <div class="dashboard-block">
           <h3>Kelola Harga Jasa dan Sparepart</h3>
           <form id="mechanicServiceForm" class="catalog-form">
             <label for="mechanicServiceName">Nama Jasa</label>
@@ -120,6 +134,14 @@
             <button type="submit" class="btn-secondary">Simpan Sparepart</button>
           </form>
           <p class="result" id="mechanicPartResult"></p>
+        </div>
+        <div class="dashboard-block">
+          <h3>Daftar Jasa Tersimpan</h3>
+          <div id="mechanicServiceCatalogList" class="catalog-grid"></div>
+        </div>
+        <div class="dashboard-block">
+          <h3>Daftar Sparepart Tersimpan</h3>
+          <div id="mechanicPartCatalogList" class="catalog-grid"></div>
         </div>
       </article>
     </section>

@@ -44,10 +44,14 @@ const adminServiceForm = document.getElementById("adminServiceForm");
 const adminServiceResult = document.getElementById("adminServiceResult");
 const adminPartForm = document.getElementById("adminPartForm");
 const adminPartResult = document.getElementById("adminPartResult");
+const adminServiceCatalogList = document.getElementById("adminServiceCatalogList");
+const adminPartCatalogList = document.getElementById("adminPartCatalogList");
 const mechanicServiceForm = document.getElementById("mechanicServiceForm");
 const mechanicServiceResult = document.getElementById("mechanicServiceResult");
 const mechanicPartForm = document.getElementById("mechanicPartForm");
 const mechanicPartResult = document.getElementById("mechanicPartResult");
+const mechanicServiceCatalogList = document.getElementById("mechanicServiceCatalogList");
+const mechanicPartCatalogList = document.getElementById("mechanicPartCatalogList");
 
 let count = 0;
 let adminLoggedIn = false;
@@ -233,6 +237,7 @@ if (adminLoginForm && adminLoginResult) {
         adminLoggedIn = true;
         loadMechanics();
         loadRequests();
+        loadAdminCatalogs();
       }
     } catch (error) {
       adminLoginResult.textContent = "Tidak dapat login admin. Coba lagi nanti.";
@@ -380,6 +385,58 @@ const initPublicPage = async () => {
   await loadPartsCatalog();
 };
 
+const loadAdminCatalogs = async () => {
+  if (adminServiceCatalogList) {
+    try {
+      const response = await fetch("/api/services", { credentials: "include" });
+      const data = await response.json();
+      if (response.ok) {
+        renderCatalogList(data.services, adminServiceCatalogList);
+      }
+    } catch (error) {
+      adminServiceCatalogList.innerHTML = "<p>Tidak dapat memuat layanan admin.</p>";
+    }
+  }
+
+  if (adminPartCatalogList) {
+    try {
+      const response = await fetch("/api/parts", { credentials: "include" });
+      const data = await response.json();
+      if (response.ok) {
+        renderCatalogList(data.parts, adminPartCatalogList);
+      }
+    } catch (error) {
+      adminPartCatalogList.innerHTML = "<p>Tidak dapat memuat sparepart admin.</p>";
+    }
+  }
+};
+
+const loadMechanicCatalogs = async () => {
+  if (mechanicServiceCatalogList) {
+    try {
+      const response = await fetch("/api/services", { credentials: "include" });
+      const data = await response.json();
+      if (response.ok) {
+        renderCatalogList(data.services, mechanicServiceCatalogList);
+      }
+    } catch (error) {
+      mechanicServiceCatalogList.innerHTML = "<p>Tidak dapat memuat layanan mekanik.</p>";
+    }
+  }
+
+  if (mechanicPartCatalogList) {
+    try {
+      const response = await fetch("/api/parts", { credentials: "include" });
+      const data = await response.json();
+      if (response.ok) {
+        renderCatalogList(data.parts, mechanicPartCatalogList);
+      }
+    } catch (error) {
+      mechanicPartCatalogList.innerHTML = "<p>Tidak dapat memuat sparepart mekanik.</p>";
+    }
+  }
+};
+
 const loadMechanicRequests = async () => {
   if (!mechanicRequestsList) return;
 
@@ -411,6 +468,7 @@ const checkAdminSession = async () => {
       adminPanel.classList.remove("hidden");
       loadMechanics();
       loadRequests();
+      loadAdminCatalogs();
     }
   } catch (error) {
     // ignore session restore failure
@@ -542,6 +600,7 @@ if (loginForm && loginResult) {
         }
         await loadMechanicProfile();
         loadMechanicRequests();
+        loadMechanicCatalogs();
       }
     } catch (error) {
       loginResult.textContent = "Tidak dapat login. Coba lagi nanti.";
@@ -854,8 +913,15 @@ const handleCatalogForm = async (form, endpoint, resultElement) => {
       payload.category = category;
     }
 
-    await saveCatalogItem(endpoint, payload, resultElement);
-    form.reset();
+    const saved = await saveCatalogItem(endpoint, payload, resultElement);
+    if (saved) {
+      if (form.id.startsWith("admin")) {
+        loadAdminCatalogs();
+      } else if (form.id.startsWith("mechanic")) {
+        loadMechanicCatalogs();
+      }
+      form.reset();
+    }
   });
 };
 

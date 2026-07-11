@@ -168,6 +168,31 @@ main {
   margin-top: 1rem;
 }
 
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.catalog-item {
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+}
+
+.catalog-item strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.catalog-item p {
+  margin: 0.4rem 0;
+  color: var(--muted);
+}
+
 .info {
   padding: 2rem;
   background: linear-gradient(180deg, rgba(249, 115, 22, 0.12), transparent);
@@ -213,23 +238,22 @@ main {
 }
 
 .brand-icon {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 999px;
+  background: white;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  color: white;
-  font-size: 1.25rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
 }
 
-.brand-honda { background: #e60012; }
-.brand-yamaha { background: #0033a0; }
-.brand-suzuki { background: #003e7e; }
-.brand-daihatsu { background: #ed1c24; }
-.brand-toyota { background: #eb0a1e; }
-.brand-mitsubishi { background: #d21f20; }
+.brand-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .site-footer {
   text-align: center;
